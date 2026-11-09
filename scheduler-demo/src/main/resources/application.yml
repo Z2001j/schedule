@@ -1,0 +1,21 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: scheduler-demo
+
+scheduler:
+  executor:
+    enabled: true
+    app-name: demo-app
+    admin-addresses:
+      - http://localhost:8080
+    # 必须与 server.port 一致：调度中心按此地址回调执行器 /scheduler-executor/run
+    port: 9999
+    access-token: changeme
+    heartbeat-interval: 10
+
+logging:
+  level:
+    com.common.schedule: INFO

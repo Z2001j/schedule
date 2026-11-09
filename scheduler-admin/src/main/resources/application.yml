@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: scheduler-admin
+  datasource:
+    url: jdbc:h2:mem:scheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: never
+
+scheduler:
+  admin:
+    enabled: true
+    pool-size: 8
+    table-name: sched_task
+    executor-table-name: sched_executor
+    log-table-name: sched_task_log
+    auto-ddl: true
+    access-token: changeme
+    heartbeat-timeout: 90
+    reaper-interval: 30
+    trigger-timeout: 5000
+    min-period-ms: 1000
+    # 控制台管理 API（/api/tasks、/api/executors）令牌鉴权，生产保持 true
+    management-auth-enabled: true
+    # 管理 API 专用令牌；留空则回退使用 access-token。设为独立值可与执行器令牌权限隔离
+    management-token: ""
+    # 多 admin 部署时开启选主，仅 leader 到点触发；单实例保持 false
+    ha-enabled: false
+    election-interval: 10
+    leader-timeout: 30
+    leader-table-name: sched_leader
+
+logging:
+  level:
+    com.common.schedule: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: jdbc:mysql://localhost:3306/scheduler?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root

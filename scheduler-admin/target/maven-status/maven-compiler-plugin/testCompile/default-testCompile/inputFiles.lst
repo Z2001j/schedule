@@ -1,0 +1,12 @@
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\ha\AdminLeaderElectionTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\ha\HaBootstrapIntegrationTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\registry\RegistryReaperTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\registry\RegistryServiceTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\route\RouteStrategyTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\schedule\AdminSchedulerGatingTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\schedule\TriggerServiceTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\service\ScheduleValidatorTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\service\TaskServiceTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\storage\AbstractDaoTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\storage\DaoIntegrationTest.java
+C:\java_project\scheduled-config\scheduler-admin\src\test\java\com\common\schedule\admin\web\AdminApiIntegrationTest.java

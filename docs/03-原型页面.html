@@ -1,0 +1,336 @@
+<div id="sched-app">
+<style>
+  #sched-app{--primary:#2f6bff;--bg:#f5f7fa;--card:#fff;--border:#e6e8eb;--text:#1f2329;--sub:#8a9099;--green:#16a34a;--green-bg:#e8f7ee;--red:#dc2626;--red-bg:#fdecec;--gray:#6b7280;--gray-bg:#eef0f3;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg);padding:20px;min-height:100vh;box-sizing:border-box;}
+  #sched-app *{box-sizing:border-box;}
+  .sch-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px;}
+  .sch-title{font-size:20px;font-weight:700;margin:0;}
+  .sch-sub{color:var(--sub);font-size:13px;margin-top:4px;}
+  .sch-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .sch-tab{padding:10px 18px;cursor:pointer;font-size:14px;color:var(--sub);border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .sch-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
+  .sch-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+  .sch-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .sch-stat .n{font-size:24px;font-weight:700;}
+  .sch-stat .l{color:var(--sub);font-size:12px;margin-top:2px;}
+  .sch-stat.green .n{color:var(--green);} .sch-stat.gray .n{color:var(--gray);} .sch-stat.blue .n{color:var(--primary);}
+  .sch-toolbar{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;flex-wrap:wrap;}
+  .sch-input,.sch-select{height:34px;border:1px solid var(--border);border-radius:6px;padding:0 10px;font-size:13px;background:#fff;color:var(--text);outline:none;}
+  .sch-input:focus,.sch-select:focus{border-color:var(--primary);}
+  .sch-input{width:220px;}
+  .sch-btn{height:34px;padding:0 14px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;color:var(--text);}
+  .sch-btn:hover{border-color:var(--primary);color:var(--primary);}
+  .sch-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .sch-btn.primary:hover{opacity:.9;color:#fff;}
+  .sch-spacer{flex:1;}
+  .sch-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:auto;}
+  table.sch-table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px;}
+  .sch-table th{background:#fafbfc;text-align:left;padding:11px 12px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;}
+  .sch-table td{padding:11px 12px;border-bottom:1px solid #f0f1f3;vertical-align:middle;}
+  .sch-table tr:last-child td{border-bottom:none;}
+  .sch-table tr:hover td{background:#fafcff;}
+  .sch-name{font-weight:600;}
+  .sch-id{color:var(--sub);font-size:11px;margin-top:2px;font-family:monospace;}
+  .sch-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;line-height:18px;white-space:nowrap;}
+  .sch-tag.type{background:#eef3ff;color:var(--primary);}
+  .sch-tag.app{background:#f3eefe;color:#7c3aed;}
+  .sch-tag.route{background:#fff4e6;color:#d97706;}
+  .sch-tag.on{background:var(--green-bg);color:var(--green);}
+  .sch-tag.off{background:var(--gray-bg);color:var(--gray);}
+  .sch-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+  .sch-dot.on{background:var(--green);} .sch-dot.off{background:var(--gray);}
+  .sch-period{font-family:monospace;font-size:12px;}
+  .sch-time{font-size:12px;} .sch-time .r{color:var(--sub);font-size:11px;}
+  .sch-ok{color:var(--green);} .sch-fail{color:var(--red);}
+  .sch-acts{display:flex;gap:4px;white-space:nowrap;}
+  .sch-link{background:none;border:none;color:var(--primary);cursor:pointer;font-size:13px;padding:2px 4px;}
+  .sch-link:hover{text-decoration:underline;}
+  .sch-link.danger{color:var(--red);} .sch-link.go{color:var(--green);} .sch-link.muted{color:var(--sub);}
+  .sch-empty{padding:40px;text-align:center;color:var(--sub);}
+  .sch-foot{padding:10px 14px;color:var(--sub);font-size:12px;display:flex;justify-content:space-between;}
+  .sch-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;}
+  .sch-mask.show{display:flex;}
+  .sch-dialog{background:#fff;border-radius:12px;width:540px;max-width:94vw;box-shadow:0 12px 40px rgba(0,0,0,.2);overflow:hidden;max-height:90vh;display:flex;flex-direction:column;}
+  .sch-dlg-head{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:16px;display:flex;justify-content:space-between;}
+  .sch-x{cursor:pointer;color:var(--sub);border:none;background:none;font-size:18px;}
+  .sch-dlg-body{padding:20px;overflow:auto;}
+  .sch-field{margin-bottom:15px;}
+  .sch-label{display:block;font-size:13px;margin-bottom:6px;}
+  .sch-label .req{color:var(--red);}
+  .sch-radio{display:flex;gap:8px;}
+  .sch-radio label{flex:1;border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center;cursor:pointer;font-size:13px;}
+  .sch-radio input{display:none;}
+  .sch-radio label.sel{border-color:var(--primary);background:#eef3ff;color:var(--primary);font-weight:600;}
+  .sch-full{width:100%;}
+  .sch-help{font-size:12px;color:var(--sub);margin-top:6px;}
+  .sch-row2{display:flex;gap:12px;} .sch-row2 .sch-field{flex:1;}
+  .sch-preview{background:#f7f9fc;border:1px dashed var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--sub);margin-top:8px;}
+  .sch-err{color:var(--red);font-size:12px;margin-top:6px;display:none;}
+  .sch-dlg-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+  .sch-drawer{position:fixed;top:0;right:0;height:100vh;width:460px;max-width:94vw;background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.15);z-index:60;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;}
+  .sch-drawer.show{transform:translateX(0);}
+  .sch-drawer-head{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;display:flex;justify-content:space-between;}
+  .sch-drawer-body{padding:16px 20px;overflow:auto;flex:1;}
+  .sch-log{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;}
+  .sch-log .top{display:flex;justify-content:space-between;margin-bottom:6px;}
+  .sch-log .meta{color:var(--sub);line-height:1.7;}
+  .sch-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1f2329;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:99;opacity:0;transition:opacity .25s;pointer-events:none;}
+  .sch-toast.show{opacity:1;} .sch-toast.ok{background:var(--green);} .sch-toast.err{background:var(--red);}
+  .sch-hide{display:none;}
+  @media(max-width:720px){.sch-stats{grid-template-columns:repeat(2,1fr);}.sch-input{width:100%;}}
+</style>
+
+<div class="sch-head">
+  <div>
+    <h1 class="sch-title">定时任务调度中心</h1>
+    <div class="sch-sub">调度与执行分离 · 跨服务集中治理 · 集群路由协调 · 配置持久化</div>
+  </div>
+  <button class="sch-btn" onclick="SchApp.refresh()">↻ 刷新</button>
+</div>
+
+<div class="sch-tabs">
+  <div class="sch-tab active" data-tab="task" onclick="SchApp.tab('task')">任务管理</div>
+  <div class="sch-tab" data-tab="executor" onclick="SchApp.tab('executor')">执行器监控</div>
+</div>
+
+<!-- 任务管理 -->
+<div id="tab-task">
+  <div class="sch-stats">
+    <div class="sch-stat blue"><div class="n" id="st-total">0</div><div class="l">任务总数</div></div>
+    <div class="sch-stat green"><div class="n" id="st-on">0</div><div class="l">运行中</div></div>
+    <div class="sch-stat gray"><div class="n" id="st-off">0</div><div class="l">已停止</div></div>
+    <div class="sch-stat"><div class="n" id="st-app">0</div><div class="l">接入服务</div></div>
+  </div>
+  <div class="sch-toolbar">
+    <input class="sch-input" id="f-kw" placeholder="搜索任务名称 / ID" oninput="SchApp.render()">
+    <select class="sch-select" id="f-app" onchange="SchApp.render()"><option value="">全部服务</option></select>
+    <select class="sch-select" id="f-status" onchange="SchApp.render()"><option value="">全部状态</option><option value="on">运行中</option><option value="off">已停止</option></select>
+    <div class="sch-spacer"></div>
+    <span style="color:var(--sub);font-size:12px">共 <b id="f-count">0</b> 个任务</span>
+  </div>
+  <div class="sch-table-wrap">
+    <table class="sch-table">
+      <thead><tr>
+        <th>任务名称</th><th>所属服务</th><th>类型</th><th>执行周期</th><th>路由策略</th><th>状态</th>
+        <th>上次执行</th><th>下次执行</th><th style="width:230px">操作</th>
+      </tr></thead>
+      <tbody id="sch-tbody"></tbody>
+    </table>
+    <div class="sch-foot"><span>周期配置以调度中心 DB 为权威 · 修改即时生效，业务服务无感</span><span>原型演示数据</span></div>
+  </div>
+</div>
+
+<!-- 执行器监控 -->
+<div id="tab-executor" class="sch-hide">
+  <div class="sch-toolbar">
+    <input class="sch-input" id="e-kw" placeholder="搜索服务名 / 地址" oninput="SchApp.renderExec()">
+    <div class="sch-spacer"></div>
+    <span style="color:var(--sub);font-size:12px">心跳超时 90s 自动剔除 · 停机主动注销</span>
+  </div>
+  <div class="sch-table-wrap">
+    <table class="sch-table">
+      <thead><tr><th>服务 appName</th><th>在线实例</th><th>执行器地址</th><th>最后心跳</th><th>状态</th></tr></thead>
+      <tbody id="exec-tbody"></tbody>
+    </table>
+    <div class="sch-foot"><span>同一 appName 多实例由调度中心按路由策略协调</span><span>原型演示数据</span></div>
+  </div>
+</div>
+
+<!-- 编辑任务弹窗 -->
+<div class="sch-mask" id="sch-mask">
+  <div class="sch-dialog">
+    <div class="sch-dlg-head"><span>编辑任务</span><button class="sch-x" onclick="SchApp.closeDialog()">×</button></div>
+    <div class="sch-dlg-body">
+      <div class="sch-field">
+        <label class="sch-label">任务</label>
+        <div id="d-task" style="font-weight:600"></div><div class="sch-id" id="d-id"></div>
+      </div>
+      <div class="sch-field">
+        <label class="sch-label"><span class="req">*</span> 调度类型</label>
+        <div class="sch-radio" id="d-type">
+          <label data-v="CRON"><input type="radio" name="dtype" value="CRON">Cron</label>
+          <label data-v="FIXED_RATE"><input type="radio" name="dtype" value="FIXED_RATE">固定频率</label>
+          <label data-v="FIXED_DELAY"><input type="radio" name="dtype" value="FIXED_DELAY">固定延迟</label>
+        </div>
+      </div>
+      <div class="sch-field" id="f-cron">
+        <label class="sch-label"><span class="req">*</span> Cron 表达式</label>
+        <input class="sch-input sch-full" id="d-cron" placeholder="如 0 */5 * * * ?" oninput="SchApp.previewCron()">
+        <div class="sch-help">Spring 6 位 cron：秒 分 时 日 月 周</div>
+        <div class="sch-preview" id="cron-preview">下次执行时间由调度中心精确计算</div>
+        <div class="sch-err" id="cron-err">Cron 表达式不合法</div>
+      </div>
+      <div class="sch-field" id="f-rate" style="display:none">
+        <label class="sch-label"><span class="req">*</span> 固定频率（毫秒）</label>
+        <input class="sch-input sch-full" id="d-rate" type="number" min="1000" placeholder="如 60000">
+        <div class="sch-help">最小 1000ms</div>
+      </div>
+      <div class="sch-field" id="f-delay" style="display:none">
+        <label class="sch-label"><span class="req">*</span> 固定延迟（毫秒）</label>
+        <input class="sch-input sch-full" id="d-delay" type="number" min="1000" placeholder="如 60000">
+        <div class="sch-help">上次结束后等待该时长，最小 1000ms</div>
+      </div>
+      <div class="sch-row2">
+        <div class="sch-field">
+          <label class="sch-label">路由策略</label>
+          <select class="sch-select sch-full" id="d-route">
+            <option value="FIRST">第一个</option><option value="LAST">最后一个</option>
+            <option value="ROUND">轮询</option><option value="RANDOM">随机</option>
+            <option value="CONSISTENT_HASH">一致性HASH</option><option value="FAILOVER">故障转移</option>
+            <option value="SHARDING_BROADCAST">分片广播</option>
+          </select>
+        </div>
+        <div class="sch-field">
+          <label class="sch-label">阻塞策略</label>
+          <select class="sch-select sch-full" id="d-block">
+            <option value="SERIAL">串行排队</option><option value="DISCARD">丢弃本次</option><option value="OVERRIDE">覆盖前次</option>
+          </select>
+        </div>
+      </div>
+      <div class="sch-field">
+        <label class="sch-label">初始延迟（毫秒）</label>
+        <input class="sch-input sch-full" id="d-initial" type="number" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="sch-dlg-foot">
+      <button class="sch-btn" onclick="SchApp.closeDialog()">取消</button>
+      <button class="sch-btn primary" onclick="SchApp.save()">保存并生效</button>
+    </div>
+  </div>
+</div>
+
+<!-- 日志抽屉 -->
+<div class="sch-drawer" id="sch-drawer">
+  <div class="sch-drawer-head"><span id="log-title">执行日志</span><button class="sch-x" onclick="SchApp.closeLog()">×</button></div>
+  <div class="sch-drawer-body" id="log-body"></div>
+</div>
+
+<div class="sch-toast" id="sch-toast"></div>
+
+<script>
+(function(){
+  var tasks=[
+    {id:"order-service:orderTask.closeTimeout",name:"订单超时关闭",app:"order-service",group:"order",type:"CRON",cron:"0 */5 * * * ?",rate:null,delay:null,initial:0,route:"FAILOVER",block:"SERIAL",enabled:true,last:"2026-11-07 18:35:00",lastOk:true,next:"2026-11-07 18:40:00"},
+    {id:"order-service:syncTask.pullStock",name:"库存同步",app:"order-service",group:"order",type:"FIXED_RATE",cron:"",rate:30000,delay:null,initial:5000,route:"ROUND",block:"DISCARD",enabled:true,last:"2026-11-07 18:37:30",lastOk:false,next:"2026-11-07 18:38:00"},
+    {id:"report-service:reportTask.dailySummary",name:"每日经营报表",app:"report-service",group:"report",type:"CRON",cron:"0 0 1 * * ?",rate:null,delay:null,initial:0,route:"FIRST",block:"SERIAL",enabled:true,last:"2026-11-07 01:00:00",lastOk:true,next:"2026-11-08 01:00:00"},
+    {id:"report-service:statTask.hourlyAgg",name:"小时指标聚合",app:"report-service",group:"report",type:"CRON",cron:"0 0 * * * ?",rate:null,delay:null,initial:0,route:"CONSISTENT_HASH",block:"SERIAL",enabled:true,last:"2026-11-07 18:00:00",lastOk:true,next:"2026-11-07 19:00:00"},
+    {id:"system-service:cleanTask.expireCache",name:"过期缓存清理",app:"system-service",group:"system",type:"FIXED_DELAY",cron:"",rate:null,delay:120000,initial:0,route:"RANDOM",block:"SERIAL",enabled:true,last:"2026-11-07 18:36:10",lastOk:true,next:"2026-11-07 18:38:10"},
+    {id:"data-service:batchTask.userProfile",name:"用户画像批处理",app:"data-service",group:"batch",type:"CRON",cron:"0 0 2 * * ?",rate:null,delay:null,initial:0,route:"SHARDING_BROADCAST",block:"SERIAL",enabled:true,last:"2026-11-07 02:00:00",lastOk:true,next:"2026-11-08 02:00:00"},
+    {id:"notify-service:notifyTask.pushMessage",name:"消息推送补偿",app:"notify-service",group:"default",type:"FIXED_RATE",cron:"",rate:60000,delay:null,initial:0,route:"FAILOVER",block:"OVERRIDE",enabled:false,last:"2026-11-06 22:10:00",lastOk:true,next:"—"}
+  ];
+  var executors=[
+    {app:"order-service",nodes:[{addr:"http://10.0.0.1:9999",beat:"2026-11-07 18:38:05",on:true},{addr:"http://10.0.0.2:9999",beat:"2026-11-07 18:38:08",on:true},{addr:"http://10.0.0.3:9999",beat:"2026-11-07 18:36:20",on:false}]},
+    {app:"report-service",nodes:[{addr:"http://10.0.1.1:9999",beat:"2026-11-07 18:38:01",on:true}]},
+    {app:"system-service",nodes:[{addr:"http://10.0.2.1:9999",beat:"2026-11-07 18:38:03",on:true},{addr:"http://10.0.2.2:9999",beat:"2026-11-07 18:38:06",on:true}]},
+    {app:"data-service",nodes:[{addr:"http://10.0.3.1:9999",beat:"2026-11-07 18:38:02",on:true},{addr:"http://10.0.3.2:9999",beat:"2026-11-07 18:38:04",on:true},{addr:"http://10.0.3.3:9999",beat:"2026-11-07 18:38:07",on:true}]},
+    {app:"notify-service",nodes:[{addr:"http://10.0.4.1:9999",beat:"2026-11-07 18:38:00",on:true}]}
+  ];
+  var routeLabel={FIRST:"第一个",LAST:"最后一个",ROUND:"轮询",RANDOM:"随机",CONSISTENT_HASH:"一致性HASH",FAILOVER:"故障转移",SHARDING_BROADCAST:"分片广播"};
+  var editing=null;
+  function $(id){return document.getElementById(id);}
+  function typeLabel(t){return t==="CRON"?"Cron":t==="FIXED_RATE"?"固定频率":"固定延迟";}
+  function periodText(t){return t.type==="CRON"?t.cron:t.type==="FIXED_RATE"?"每 "+(t.rate/1000)+" 秒":"结束后 "+(t.delay/1000)+" 秒";}
+  function toast(m,k){var e=$("sch-toast");e.textContent=m;e.className="sch-toast show "+(k||"");setTimeout(function(){e.className="sch-toast";},2200);}
+  function apps(){return tasks.map(function(t){return t.app;}).filter(function(v,i,a){return a.indexOf(v)===i;});}
+  function filtered(){
+    var kw=$("f-kw").value.trim().toLowerCase(),app=$("f-app").value,s=$("f-status").value;
+    return tasks.filter(function(t){
+      if(kw&&t.name.toLowerCase().indexOf(kw)<0&&t.id.toLowerCase().indexOf(kw)<0)return false;
+      if(app&&t.app!==app)return false;
+      if(s==="on"&&!t.enabled)return false; if(s==="off"&&t.enabled)return false; return true;
+    });
+  }
+  function render(){
+    var sel=$("f-app"); if(sel.options.length<=1){apps().forEach(function(a){var o=document.createElement("option");o.value=a;o.textContent=a;sel.appendChild(o);});}
+    var list=filtered(),tb=$("sch-tbody");tb.innerHTML="";
+    $("f-count").textContent=list.length;$("st-total").textContent=tasks.length;
+    $("st-on").textContent=tasks.filter(function(t){return t.enabled;}).length;
+    $("st-off").textContent=tasks.filter(function(t){return !t.enabled;}).length;
+    $("st-app").textContent=apps().length;
+    if(!list.length){tb.innerHTML='<tr><td colspan="9"><div class="sch-empty">没有匹配的任务</div></td></tr>';return;}
+    list.forEach(function(t){
+      var tr=document.createElement("tr");
+      tr.innerHTML=
+        '<td><div class="sch-name">'+t.name+'</div><div class="sch-id">'+t.id+'</div></td>'+
+        '<td><span class="sch-tag app">'+t.app+'</span></td>'+
+        '<td><span class="sch-tag type">'+typeLabel(t.type)+'</span></td>'+
+        '<td><span class="sch-period">'+periodText(t)+'</span></td>'+
+        '<td><span class="sch-tag route">'+routeLabel[t.route]+'</span></td>'+
+        '<td><span class="sch-tag '+(t.enabled?"on":"off")+'"><span class="sch-dot '+(t.enabled?"on":"off")+'"></span>'+(t.enabled?"运行中":"已停止")+'</span></td>'+
+        '<td><div class="sch-time">'+t.last+'</div><div class="r '+(t.lastOk?"sch-ok":"sch-fail")+'">'+(t.lastOk?"✓ 成功":"✗ 失败")+'</div></td>'+
+        '<td><span class="sch-time">'+t.next+'</span></td>'+
+        '<td><div class="sch-acts">'+
+          '<button class="sch-link" onclick="SchApp.openDialog(\''+t.id+'\')">编辑</button>'+
+          (t.enabled?'<button class="sch-link danger" onclick="SchApp.toggle(\''+t.id+'\')">停止</button>':'<button class="sch-link go" onclick="SchApp.toggle(\''+t.id+'\')">启动</button>')+
+          '<button class="sch-link" onclick="SchApp.trigger(\''+t.id+'\')">执行一次</button>'+
+          '<button class="sch-link muted" onclick="SchApp.openLog(\''+t.id+'\')">日志</button>'+
+        '</div></td>';
+      tb.appendChild(tr);
+    });
+  }
+  function renderExec(){
+    var kw=($("e-kw").value||"").trim().toLowerCase(),tb=$("exec-tbody");tb.innerHTML="";
+    executors.filter(function(e){return !kw||e.app.toLowerCase().indexOf(kw)>=0||e.nodes.some(function(n){return n.addr.indexOf(kw)>=0;});}).forEach(function(e){
+      var online=e.nodes.filter(function(n){return n.on;}).length;
+      e.nodes.forEach(function(n,i){
+        var tr=document.createElement("tr");
+        tr.innerHTML=(i===0?'<td rowspan="'+e.nodes.length+'"><span class="sch-tag app">'+e.app+'</span></td><td rowspan="'+e.nodes.length+'"><b style="color:'+(online?'var(--green)':'var(--gray)')+'">'+online+'</b> / '+e.nodes.length+'</td>':'')+
+          '<td><span class="sch-period">'+n.addr+'</span></td>'+
+          '<td><span class="sch-time">'+n.beat+'</span></td>'+
+          '<td><span class="sch-tag '+(n.on?"on":"off")+'"><span class="sch-dot '+(n.on?"on":"off")+'"></span>'+(n.on?"在线":"下线")+'</span></td>';
+        tb.appendChild(tr);
+      });
+    });
+  }
+  function find(id){return tasks.filter(function(t){return t.id===id;})[0];}
+  function setTypeUI(v){
+    $("d-type").querySelectorAll("label").forEach(function(l){l.classList.toggle("sel",l.getAttribute("data-v")===v);});
+    $("f-cron").style.display=v==="CRON"?"":"none";$("f-rate").style.display=v==="FIXED_RATE"?"":"none";$("f-delay").style.display=v==="FIXED_DELAY"?"":"none";
+  }
+  function openDialog(id){
+    editing=find(id);if(!editing)return;
+    $("d-task").textContent=editing.name+"（"+editing.app+"）";$("d-id").textContent=editing.id;
+    $("d-cron").value=editing.cron||"";$("d-rate").value=editing.rate||"";$("d-delay").value=editing.delay||"";$("d-initial").value=editing.initial||0;
+    $("d-route").value=editing.route;$("d-block").value=editing.block;$("cron-err").style.display="none";
+    setTypeUI(editing.type);$("sch-mask").classList.add("show");
+  }
+  function closeDialog(){$("sch-mask").classList.remove("show");editing=null;}
+  function validCron(c){c=(c||"").trim();var p=c.split(/\s+/);return p.length===6&&p.every(function(s){return /^[\d*?,\/\-A-Z]+$/i.test(s);});}
+  function previewCron(){var c=$("d-cron").value,ok=validCron(c);$("cron-err").style.display=ok||!c?"none":"block";}
+  function save(){
+    if(!editing)return;var type=document.querySelector('#d-type label.sel').getAttribute("data-v");
+    if(type==="CRON"){var c=$("d-cron").value.trim();if(!validCron(c)){$("cron-err").style.display="block";toast("Cron 表达式不合法","err");return;}editing.cron=c;editing.rate=null;editing.delay=null;}
+    else if(type==="FIXED_RATE"){var r=parseInt($("d-rate").value,10);if(!r||r<1000){toast("固定频率需 ≥ 1000ms","err");return;}editing.rate=r;editing.cron="";editing.delay=null;}
+    else{var d=parseInt($("d-delay").value,10);if(!d||d<1000){toast("固定延迟需 ≥ 1000ms","err");return;}editing.delay=d;editing.cron="";editing.rate=null;}
+    editing.type=type;editing.initial=parseInt($("d-initial").value,10)||0;editing.route=$("d-route").value;editing.block=$("d-block").value;
+    closeDialog();render();toast("已保存并即时生效（调度中心已重调度，业务服务无感）","ok");
+  }
+  function toggle(id){var t=find(id);if(!t)return;
+    if(t.enabled){if(!confirm("确认停止任务「"+t.name+"」？调度中心将不再触发。"))return;t.enabled=false;t.next="—";toast("任务已停止","ok");}
+    else{t.enabled=true;t.next="按配置重新计算";toast("任务已启动","ok");}render();}
+  function trigger(id){var t=find(id);if(!t)return;
+    var e=executors.filter(function(x){return x.app===t.app;})[0];
+    var target=t.route==="SHARDING_BROADCAST"?"全部 "+(e?e.nodes.filter(function(n){return n.on;}).length:0)+" 台实例（分片广播）":(e&&e.nodes.filter(function(n){return n.on;})[0]||{}).addr||"无在线实例";
+    t.last="2026-11-07 18:38:20";t.lastOk=true;render();toast("已触发 → "+target,"ok");}
+  function openLog(id){var t=find(id);$("log-title").textContent="执行日志 · "+t.name;
+    var rows=[
+      {time:"2026-11-07 18:35:00",addr:"http://10.0.0.1:9999",ok:true,cost:123,shard:"0/1"},
+      {time:"2026-11-07 18:30:00",addr:"http://10.0.0.2:9999",ok:true,cost:98,shard:"0/1"},
+      {time:"2026-11-07 18:25:00",addr:"http://10.0.0.1:9999",ok:false,cost:0,shard:"0/1",err:"下游库存服务超时"},
+      {time:"2026-11-07 18:20:00",addr:"http://10.0.0.3:9999",ok:true,cost:156,shard:"0/1"}
+    ];
+    $("log-body").innerHTML=rows.map(function(r){return '<div class="sch-log"><div class="top"><b>'+r.time+'</b><span class="'+(r.ok?"sch-ok":"sch-fail")+'">'+(r.ok?"✓ 成功":"✗ 失败")+'</span></div><div class="meta">触发类型：周期调度 · 路由：'+routeLabel[t.route]+'<br>执行器：'+r.addr+' · 分片：'+r.shard+' · 耗时：'+r.cost+'ms'+(r.err?'<br><span class="sch-fail">异常：'+r.err+'</span>':'')+'</div></div>';}).join("");
+    $("sch-drawer").classList.add("show");}
+  function closeLog(){$("sch-drawer").classList.remove("show");}
+  function tab(name){
+    document.querySelectorAll(".sch-tab").forEach(function(t){t.classList.toggle("active",t.getAttribute("data-tab")===name);});
+    $("tab-task").classList.toggle("sch-hide",name!=="task");$("tab-executor").classList.toggle("sch-hide",name!=="executor");
+    if(name==="executor")renderExec();
+  }
+  function refresh(){render();renderExec();toast("已刷新","");}
+  $("d-type").addEventListener("click",function(e){var l=e.target.closest("label");if(l)setTypeUI(l.getAttribute("data-v"));});
+  $("sch-mask").addEventListener("click",function(e){if(e.target===this)closeDialog();});
+  window.SchApp={render:render,renderExec:renderExec,openDialog:openDialog,closeDialog:closeDialog,save:save,toggle:toggle,trigger:trigger,openLog:openLog,closeLog:closeLog,tab:tab,refresh:refresh,previewCron:previewCron};
+  render();
+})();
+</script>
+</div>

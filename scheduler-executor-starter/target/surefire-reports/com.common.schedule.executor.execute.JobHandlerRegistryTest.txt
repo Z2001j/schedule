@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.common.schedule.executor.execute.JobHandlerRegistryTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.497 s -- in com.common.schedule.executor.execute.JobHandlerRegistryTest

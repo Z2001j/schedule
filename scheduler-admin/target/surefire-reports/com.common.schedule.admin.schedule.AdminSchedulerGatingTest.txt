@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.common.schedule.admin.schedule.AdminSchedulerGatingTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.279 s -- in com.common.schedule.admin.schedule.AdminSchedulerGatingTest

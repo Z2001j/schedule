@@ -1,0 +1,12 @@
+com\common\schedule\admin\web\AdminApiIntegrationTest.class
+com\common\schedule\admin\ha\AdminLeaderElectionTest.class
+com\common\schedule\admin\service\ScheduleValidatorTest.class
+com\common\schedule\admin\registry\RegistryServiceTest.class
+com\common\schedule\admin\schedule\AdminSchedulerGatingTest.class
+com\common\schedule\admin\registry\RegistryReaperTest.class
+com\common\schedule\admin\storage\AbstractDaoTest.class
+com\common\schedule\admin\storage\DaoIntegrationTest.class
+com\common\schedule\admin\schedule\TriggerServiceTest.class
+com\common\schedule\admin\ha\HaBootstrapIntegrationTest.class
+com\common\schedule\admin\service\TaskServiceTest.class
+com\common\schedule\admin\route\RouteStrategyTest.class
